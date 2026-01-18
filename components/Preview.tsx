@@ -1,0 +1,240 @@
+import React from 'react';
+import { CVData, TemplateType } from '../types';
+import { MapPin, Mail, Phone, Globe, Linkedin, Calendar } from 'lucide-react';
+
+interface PreviewProps {
+  data: CVData;
+  template: TemplateType;
+}
+
+const formatDate = (dateStr: string) => {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+};
+
+export const Preview: React.FC<PreviewProps> = ({ data, template }) => {
+  // --- EUROPASS TEMPLATE ---
+  if (template === TemplateType.EUROPASS) {
+    return (
+      <div className="w-full h-full bg-white p-8 text-sm leading-relaxed shadow-lg print:shadow-none print:w-full min-h-[1000px]">
+        {/* Header */}
+        <header className="border-b-2 border-europass-blue pb-6 mb-6 flex justify-between items-start">
+          <div className="w-2/3">
+            <h1 className="text-3xl font-bold text-europass-blue uppercase tracking-wide">
+              {data.personal.firstName} {data.personal.lastName}
+            </h1>
+            <p className="text-xl text-gray-600 mt-1 font-light">{data.personal.jobTitle}</p>
+            
+            <div className="mt-4 space-y-1 text-gray-600">
+               {data.personal.address && (
+                <div className="flex items-center gap-2">
+                  <MapPin size={14} className="text-europass-blue" />
+                  <span>{data.personal.address}, {data.personal.city} {data.personal.postalCode}</span>
+                </div>
+              )}
+               {data.personal.email && (
+                <div className="flex items-center gap-2">
+                  <Mail size={14} className="text-europass-blue" />
+                  <span>{data.personal.email}</span>
+                </div>
+              )}
+               {data.personal.phone && (
+                <div className="flex items-center gap-2">
+                  <Phone size={14} className="text-europass-blue" />
+                  <span>{data.personal.phone}</span>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="w-1/3 flex justify-end">
+            <div className="w-32 h-32 bg-gray-200 flex items-center justify-center text-gray-400 text-xs text-center border border-gray-300">
+              Photo
+            </div>
+          </div>
+        </header>
+
+        <main className="grid grid-cols-[160px_1fr] gap-6">
+          {/* Left Column (Labels) */}
+          <div className="text-europass-blue font-bold uppercase text-xs pt-1">Professional Summary</div>
+          {/* Right Column (Content) */}
+          <div className="mb-6">
+             <p className="text-gray-700 whitespace-pre-wrap">{data.personal.summary}</p>
+          </div>
+
+          <div className="text-europass-blue font-bold uppercase text-xs pt-1">Work Experience</div>
+          <div className="mb-6 space-y-6">
+            {data.work.map((job) => (
+              <div key={job.id}>
+                <div className="flex justify-between items-baseline">
+                  <h3 className="font-bold text-gray-800 text-base">{job.title}</h3>
+                  <span className="text-gray-500 text-xs">
+                    {formatDate(job.startDate)} - {job.current ? 'Present' : formatDate(job.endDate)}
+                  </span>
+                </div>
+                <p className="text-gray-600 italic mb-1">{job.company} | {job.city}</p>
+                <p className="text-gray-700 whitespace-pre-wrap mt-2">{job.description}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-europass-blue font-bold uppercase text-xs pt-1">Education</div>
+          <div className="mb-6 space-y-4">
+             {data.education.map((edu) => (
+              <div key={edu.id}>
+                <div className="flex justify-between items-baseline">
+                  <h3 className="font-bold text-gray-800">{edu.degree}</h3>
+                  <span className="text-gray-500 text-xs">
+                     {formatDate(edu.startDate)} - {formatDate(edu.endDate)}
+                  </span>
+                </div>
+                <p className="text-gray-600">{edu.institution}, {edu.city}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-europass-blue font-bold uppercase text-xs pt-1">Skills</div>
+          <div className="mb-6">
+            <div className="flex flex-wrap gap-2">
+              {data.skills.map((skill, i) => (
+                <span key={i} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded border border-gray-200">
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </div>
+        </main>
+        
+        <footer className="mt-12 border-t border-gray-200 pt-4 flex justify-between items-center text-xs text-gray-400">
+          <span>© European Union, 2002-2025 | europass.cedefop.europa.eu</span>
+          <span>Generated by EuroCV AI</span>
+        </footer>
+      </div>
+    );
+  }
+
+  // --- MODERN TEMPLATE ---
+  if (template === TemplateType.MODERN) {
+     return (
+      <div className="w-full h-full bg-white shadow-lg print:shadow-none print:w-full min-h-[1000px] flex">
+        {/* Left Sidebar */}
+        <aside className="w-1/3 bg-slate-800 text-white p-8">
+           <div className="mb-8">
+             <div className="w-24 h-24 bg-slate-600 rounded-full mb-4 mx-auto flex items-center justify-center text-xs">Photo</div>
+             <h1 className="text-2xl font-bold text-center">{data.personal.firstName} <br/> {data.personal.lastName}</h1>
+             <p className="text-center text-slate-300 mt-2 text-sm">{data.personal.jobTitle}</p>
+           </div>
+
+           <div className="space-y-4 text-sm text-slate-300 mb-8">
+              {data.personal.email && <div className="flex items-center gap-2"><Mail size={14}/> {data.personal.email}</div>}
+              {data.personal.phone && <div className="flex items-center gap-2"><Phone size={14}/> {data.personal.phone}</div>}
+              {data.personal.address && <div className="flex items-center gap-2"><MapPin size={14}/> {data.personal.city}, {data.personal.country}</div>}
+           </div>
+
+           <div className="mb-8">
+             <h3 className="uppercase tracking-widest text-xs font-bold border-b border-slate-600 pb-2 mb-4 text-slate-400">Skills</h3>
+             <div className="flex flex-wrap gap-2">
+                {data.skills.map((skill, i) => (
+                  <span key={i} className="bg-slate-700 px-2 py-1 rounded text-xs">{skill}</span>
+                ))}
+             </div>
+           </div>
+        </aside>
+
+        {/* Right Content */}
+        <main className="w-2/3 p-8 text-slate-800">
+           {data.personal.summary && (
+             <div className="mb-8">
+                <h2 className="text-xl font-bold text-slate-800 mb-3 border-b-2 border-slate-200 pb-2">Profile</h2>
+                <p className="text-sm leading-relaxed text-slate-600">{data.personal.summary}</p>
+             </div>
+           )}
+
+           <div className="mb-8">
+             <h2 className="text-xl font-bold text-slate-800 mb-4 border-b-2 border-slate-200 pb-2">Experience</h2>
+             <div className="space-y-6">
+                {data.work.map((job) => (
+                  <div key={job.id}>
+                    <div className="flex justify-between font-semibold">
+                      <h3>{job.title}</h3>
+                      <span className="text-sm text-slate-500">{formatDate(job.startDate)} - {job.current ? 'Present' : formatDate(job.endDate)}</span>
+                    </div>
+                    <div className="text-sm text-slate-600 italic mb-2">{job.company}</div>
+                    <p className="text-sm text-slate-600 whitespace-pre-wrap">{job.description}</p>
+                  </div>
+                ))}
+             </div>
+           </div>
+
+           <div className="mb-8">
+             <h2 className="text-xl font-bold text-slate-800 mb-4 border-b-2 border-slate-200 pb-2">Education</h2>
+             <div className="space-y-4">
+               {data.education.map((edu) => (
+                  <div key={edu.id}>
+                    <div className="flex justify-between font-semibold">
+                      <h3>{edu.degree}</h3>
+                      <span className="text-sm text-slate-500">{formatDate(edu.startDate)} - {formatDate(edu.endDate)}</span>
+                    </div>
+                    <div className="text-sm text-slate-600">{edu.institution}</div>
+                  </div>
+                ))}
+             </div>
+           </div>
+        </main>
+      </div>
+     )
+  }
+
+  // --- MINIMAL TEMPLATE ---
+  return (
+    <div className="w-full h-full bg-white p-12 shadow-lg print:shadow-none print:w-full min-h-[1000px] font-serif">
+       <header className="text-center mb-10 border-b border-black pb-6">
+         <h1 className="text-4xl font-bold mb-2 uppercase tracking-wide">{data.personal.firstName} {data.personal.lastName}</h1>
+         <div className="text-sm flex justify-center gap-4 flex-wrap">
+            <span>{data.personal.email}</span>
+            <span>•</span>
+            <span>{data.personal.phone}</span>
+            <span>•</span>
+            <span>{data.personal.city}, {data.personal.country}</span>
+         </div>
+       </header>
+
+       <section className="mb-6">
+         <h2 className="font-bold text-lg uppercase border-b border-gray-300 mb-4 pb-1">Summary</h2>
+         <p className="text-sm leading-relaxed">{data.personal.summary}</p>
+       </section>
+
+       <section className="mb-6">
+         <h2 className="font-bold text-lg uppercase border-b border-gray-300 mb-4 pb-1">Experience</h2>
+         <div className="space-y-5">
+            {data.work.map((job) => (
+              <div key={job.id}>
+                <div className="flex justify-between font-bold text-sm">
+                   <span>{job.title}, {job.company}</span>
+                   <span>{formatDate(job.startDate)} - {job.current ? 'Present' : formatDate(job.endDate)}</span>
+                </div>
+                <p className="text-sm mt-1 whitespace-pre-wrap">{job.description}</p>
+              </div>
+            ))}
+         </div>
+       </section>
+
+       <section className="mb-6">
+         <h2 className="font-bold text-lg uppercase border-b border-gray-300 mb-4 pb-1">Education</h2>
+         <div className="space-y-3">
+            {data.education.map((edu) => (
+              <div key={edu.id} className="flex justify-between text-sm">
+                 <span className="font-bold">{edu.degree}, <span className="font-normal italic">{edu.institution}</span></span>
+                 <span>{formatDate(edu.endDate)}</span>
+              </div>
+            ))}
+         </div>
+       </section>
+
+       <section>
+          <h2 className="font-bold text-lg uppercase border-b border-gray-300 mb-4 pb-1">Skills</h2>
+          <p className="text-sm">{data.skills.join(' • ')}</p>
+       </section>
+    </div>
+  );
+};
